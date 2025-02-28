@@ -18,7 +18,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // Initialize WebSocket connection for the selected model
     function initWebSocket(model) {
         if (!socket || socket.readyState !== WebSocket.OPEN) {
-            socket = new WebSocket(`ws://localhost:8000/ws/${model.value}/`);
+            const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
+            const wsHost = window.location.host;
+            socket = new WebSocket(`${wsProtocol}://${wsHost}/ws/${model.value}/`);
 
             socket.onmessage = (event) => {
                 let data = JSON.parse(event.data);

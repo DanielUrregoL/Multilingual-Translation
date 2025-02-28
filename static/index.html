@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Real-Time Translation with Audio Playback</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module" src="/static/languages.js"></script>
+    <script type="module" src="/static/index.js"></script>
+</head>
+
+<body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen p-4 w-full">
+
+    <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
+        <select id="model" class="mb-4 p-2 border rounded-lg">
+            <option value="my_memory">Mymemory translate</option>
+            <option value="ds">DeepSeek</option>
+            <option value="gpt">GPT</option>
+        </select>
+        <h1 class="text-2xl font-bold text-center text-gray-700">Multilingual Translation</h1>
+
+        <div class="mt-4">
+            <label for="input_language" class="block text-sm font-medium text-gray-600">Input Language:</label>
+            <select id="input_language" class="w-full p-2 border rounded-lg"></select>
+        </div>
+
+        <button id="record-btn" class="mt-4 w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600">
+            Start Speaking
+        </button>
+
+        <p class="mt-4 text-gray-700"><strong>Transcription:</strong> <span id="transcript"
+                class="block p-2 bg-gray-200 rounded"></span></p>
+
+        <div class="mt-4">
+            <label for="output_language" class="block text-sm font-medium text-gray-600">Output Language:</label>
+            <select id="output_language" class="w-full p-2 border rounded-lg"></select>
+        </div>
+
+        <p class="mt-4 text-gray-700"><strong>Translation:</strong> <span id="translation"
+                class="block p-2 bg-gray-200 rounded"></span></p>
+
+        <button id="play-btn" disabled
+            class="mt-4 w-full bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 disabled:bg-gray-400">
+            Play Translation
+        </button>
+    </div>
+</body>
+
+</html>

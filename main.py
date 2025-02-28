@@ -11,7 +11,7 @@ app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # environment variables
-load_dotenv("/home/don_putas/Documents/nao_medical/api/.env")
+load_dotenv()
 
 api_key_ds = os.getenv("API_KEY_DS")
 api_key_gpt = os.getenv("API_KEY_GPT")
@@ -113,8 +113,7 @@ async def read_root():
         Returns:
             The index.html file
     """
-    with open("static/index.html", "r", encoding="utf-8") as file:
-        return HTMLResponse(content=file.read())
+    return open("static/index.html").read()
 
 if __name__ == "__main__":
     import uvicorn

@@ -13,31 +13,35 @@ document.addEventListener("DOMContentLoaded", () => {
     let isRecording = false;
     let savedTranslation = "";
     let lastTranscript = "";
-    let socket;
 
-    // Initialize WebSocket connection for the selected model
-    function initWebSocket(model) {
-        if (!socket || socket.readyState !== WebSocket.OPEN) {
-            const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
-            const wsHost = window.location.host;
-            socket = new WebSocket(`${wsProtocol}://${wsHost}/ws/${model.value}/`);
+    // Function to send text to the REST API
+    async function sendTextToAPI(text) {
+        const model = modelSelect.value;
+        const apiUrl = `/translate/${model}/`; // Adjust to match FastAPI routes
 
-            socket.onmessage = (event) => {
-                let data = JSON.parse(event.data);
-                if (data.translated_text) {
-                    savedTranslation = data.translated_text;
-                    translationEl.textContent = savedTranslation;
-                    playBtn.disabled = false;
-                }
-            };
+        try {
+            const response = await fetch(apiUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    text: text,
+                    input_lang: inputLang.value,
+                    output_lang: outputLang.value
+                })
+            });
 
-            socket.onerror = (error) => {
-                console.error("WebSocket error:", error);
-            };
+            if (!response.ok) {
+                throw new Error(`API error: ${response.statusText}`);
+            }
 
-            socket.onclose = () => {
-                console.log("WebSocket closed.");
-            };
+            const data = await response.json();
+            if (data.translated_text) {
+                savedTranslation = data.translated_text;
+                translationEl.textContent = savedTranslation;
+                playBtn.disabled = false;
+            }
+        } catch (error) {
+            console.error("Error fetching translation:", error);
         }
     }
 
@@ -60,7 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (transcript.trim() && transcript.trim() !== lastTranscript) {
                 lastTranscript = transcript.trim();
-                sendTextToWebSocket(lastTranscript);
+                sendTextToAPI(lastTranscript);
             }
         };
 
@@ -76,21 +80,9 @@ document.addEventListener("DOMContentLoaded", () => {
         };
     }
 
-    // Send transcribed text and language preferences to the WebSocket server
-    function sendTextToWebSocket(text) {
-        if (socket && socket.readyState === WebSocket.OPEN) {
-            socket.send(JSON.stringify({
-                text: text,
-                input_lang: inputLang.value,
-                output_lang: outputLang.value
-            }));
-        }
-    }
-
     // Handle recording start/stop
     recordBtn.addEventListener("click", () => {
         if (!isRecording) {
-            initWebSocket(modelSelect);
             initSpeechRecognition();
             recognition.start();
             isRecording = true;
@@ -114,11 +106,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // Restart speech recognition when the input language changes
     inputLang.addEventListener("change", () => {
         initSpeechRecognition();
-    });
-
-    // Reinitialize WebSocket connection when the translation model changes
-    modelSelect.addEventListener("change", () => {
-        initWebSocket(modelSelect);
     });
 
     // Initialize speech recognition on page load
